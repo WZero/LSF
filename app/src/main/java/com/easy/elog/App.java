@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 
+import com.easy.elog.logcat.EasyActivityLifecycleLogcat;
 import com.easy.elog.logcat.LogcatSaveFile;
 
 import java.util.List;
@@ -19,9 +20,15 @@ public class App extends Application {
         String processName = getProcessName(getApplicationContext(), android.os.Process.myPid());
         if (processName == null || !processName.equals(BuildConfig.APPLICATION_ID))
             return;
+        registerActivityLifecycleCallbacks(EasyActivityLifecycleLogcat.getInstance());
         LogcatSaveFile.initLSF(getApplicationContext());
     }
 
+    @Override
+    public void onTerminate() {
+        unregisterActivityLifecycleCallbacks(EasyActivityLifecycleLogcat.getInstance());
+        super.onTerminate();
+    }
 
     /**
      * 根据Pid获取当前进程的名字 判断是否是主进程
